@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <UserSecretsId>286eda03-a7a5-46b9-8e7d-d1f36121ba61</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Carter" Version="8.1.0" />
+	  <PackageReference Include="Marten" Version="7.18.0" />
+	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
+	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.1" />
+	  <PackageReference Include="Scrutor" Version="4.2.2" />
+	  <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="8.0.0" />
+	  <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="8.0.0" />
+	  <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+
+</Project>
