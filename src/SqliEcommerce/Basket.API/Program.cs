@@ -4,6 +4,7 @@ using Basket.API.Models;
 using Carter;
 using Common.Behaviors;
 using Common.Exceptions.Handler;
+using Discount.Grpc;
 using HealthChecks.UI.Client;
 using Marten;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -29,6 +30,22 @@ builder.Services.AddMarten(opts =>
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+
+//Grpc Services
+builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options =>
+{
+    options.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
+})
+.ConfigurePrimaryHttpMessageHandler(() =>
+{
+    var handler = new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback =
+        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    };
+
+    return handler;
+});
 
 /*
 builder.Services.AddScoped<IBasketRepository>(provider =>

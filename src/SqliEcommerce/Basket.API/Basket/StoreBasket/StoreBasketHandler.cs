@@ -1,6 +1,7 @@
 ﻿using Basket.API.Data;
 using Basket.API.Models;
 using Common.CQRS;
+using Discount.Grpc;
 using FluentValidation;
 
 namespace Basket.API.Basket.StoreBasket;
@@ -18,7 +19,7 @@ public class StoreBasketCommandValidator : AbstractValidator<StoreBasketCommand>
 }
 
 public class StoreBasketCommandHandler
-    (IBasketRepository repository/*, DiscountProtoService.DiscountProtoServiceClient discountProto*/)
+    (IBasketRepository repository, DiscountProtoService.DiscountProtoServiceClient discountClient)
     : ICommandHandler<StoreBasketCommand, StoreBasketResult>
 {
     public async Task<StoreBasketResult> Handle(StoreBasketCommand command, CancellationToken cancellationToken)
@@ -35,8 +36,13 @@ public class StoreBasketCommandHandler
         // Communicate with Discount.Grpc and calculate lastest prices of products into sc
         foreach (var item in cart.Items)
         {
-            // var coupon = await discountProto.GetDiscountAsync(new GetDiscountRequest { ProductName = item.ProductName }, cancellationToken: cancellationToken);
-            item.Price -= /*coupon.Amount*/ - 0;
+            var coupon = await discountClient.GetDiscountAsync(new GetDiscountRequest 
+            { 
+                ProductName = item.ProductName 
+            }, 
+            cancellationToken: cancellationToken);
+
+            item.Price -= coupon.Amount;
         }
     }
 }
