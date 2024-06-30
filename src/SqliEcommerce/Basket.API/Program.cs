@@ -1,8 +1,8 @@
 using Basket.API.Data;
-using Basket.API.Data.Repository;
 using Basket.API.Models;
 using Carter;
 using Common.Behaviors;
+using Common.Messaging.MassTransit;
 using Common.Exceptions.Handler;
 using Discount.Grpc;
 using HealthChecks.UI.Client;
@@ -18,6 +18,9 @@ builder.Services.AddMediatR(config =>
     config.AddOpenBehavior(typeof(ValidationBehavior<,>));
     config.AddOpenBehavior(typeof(LoggingBehavior<,>));
 });
+
+//Async Communication Services
+builder.Services.AddMessageBroker(builder.Configuration);
 
 //Data Services
 builder.Services.AddMarten(opts =>

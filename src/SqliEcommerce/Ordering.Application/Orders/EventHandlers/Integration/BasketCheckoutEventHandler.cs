@@ -7,14 +7,15 @@ using Ordering.Application.Orders.Commands.CreateOrder;
 
 namespace Ordering.Application.Orders.EventHandlers.Integration;
 public class BasketCheckoutEventHandler
-    (ISender sender, ILogger<BasketCheckoutEventHandler> logger)
-    : IConsumer<BasketCheckoutEvent>
+    (ISender sender, ILogger<BasketCheckoutEventHandler> logger) : IConsumer<BasketCheckoutEvent>
 {
     public async Task Consume(ConsumeContext<BasketCheckoutEvent> context)
     {
-        logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
-        
-        var command = MapToCreateOrderCommand(context.Message);
+        logger.LogInformation(
+            "Integration Event handled: {IntegrationEvent}", 
+            context.Message.GetType().Name);
+
+        CreateOrderCommand command = MapToCreateOrderCommand(context.Message);
         
         await sender.Send(command);
     }

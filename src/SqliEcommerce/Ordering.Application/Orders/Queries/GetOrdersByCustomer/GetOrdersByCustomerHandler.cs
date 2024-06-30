@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Ordering.Application.Data;
 using Ordering.Application.Extensions;
+using Ordering.Domain.Models;
 using Ordering.Domain.ValueObjects;
 
 namespace Ordering.Application.Orders.Queries.GetOrdersByCustomer;
@@ -12,7 +13,7 @@ public class GetOrdersByCustomerHandler(IApplicationDbContext dbContext)
         GetOrdersByCustomerQuery query, 
         CancellationToken cancellationToken)
     {
-        var orders = await dbContext.Orders
+        List<Order> orders = await dbContext.Orders
                         .Include(o => o.OrderItems)
                         .AsNoTracking()
                         .Where(o => o.CustomerId == CustomerId.Of(query.CustomerId))
