@@ -1,5 +1,6 @@
 using Carter;
 using Catalog.API.Data;
+using Catalog.API.Samples;
 using Common.Behaviors;
 using Common.Exceptions.Handler;
 using FluentValidation;
@@ -19,6 +20,7 @@ builder.Services.AddMediatR(config =>
 
 builder.Services.AddValidatorsFromAssembly(assembly);
 
+builder.Services.AddControllers();
 builder.Services.AddCarter();
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
@@ -43,11 +45,20 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.MapCarter();
 
+app.MapProductSampleEndpoints();
+
 app.UseHealthChecks("/health",
     new HealthCheckOptions
     {
         ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
     });
 
+
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers(); // Map traditional API controllers
+    // Add other endpoint mappings
+});
 
 app.Run();
