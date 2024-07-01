@@ -1,5 +1,6 @@
 using Carter;
 using Catalog.API.Data;
+using Catalog.API.Models;
 using Catalog.API.Samples;
 using Common.Behaviors;
 using Common.Exceptions.Handler;
@@ -26,9 +27,11 @@ builder.Services.AddCarter();
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.AddMarten(opts =>
+builder.Services.AddMarten(options =>
 {
-    opts.Connection(builder.Configuration.GetConnectionString("MartenDatabase")!);
+    options.Connection(builder.Configuration.GetConnectionString("MartenDatabase")!);
+    options.Schema.For<Product>();
+    options.Schema.For<Category>();
 }).UseLightweightSessions();
 
 if (builder.Environment.IsDevelopment()) 

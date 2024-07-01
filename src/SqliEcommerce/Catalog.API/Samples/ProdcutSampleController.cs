@@ -69,14 +69,17 @@ namespace Catalog.API.Samples
         [HttpGet("search")]
         public ActionResult<IEnumerable<ProductSample>> SearchProducts(string name)
         {
-            var results = _products.Where(p => p.Name.Contains(name, System.StringComparison.OrdinalIgnoreCase)).ToList();
+            var results = _products.Where(p => p.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList();
             return Ok(results);
         }
 
         [HttpGet("filter")]
         public ActionResult<IEnumerable<ProductSample>> FilterProducts(double minPrice, double maxPrice)
         {
-            var results = _products.Where(p => p.Price >= minPrice && p.Price <= maxPrice).ToList();
+            var results = _products.Where(
+                p => p.Price >= minPrice && p.Price <= maxPrice)
+                .ToList();
+
             return Ok(results);
         }
     }
