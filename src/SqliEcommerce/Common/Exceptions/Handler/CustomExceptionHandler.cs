@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Common.Exceptions.CustomProblemDetail;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +55,7 @@ public class CustomExceptionHandler
 
         ProblemDetails problemDetails = new ()
         {
-            Title = details.Title,
+            Title = $"Title: {details.Title}",
             Detail = details.Detail,
             Status = details.StatusCode,
             Instance = context.Request.Path
@@ -67,7 +68,13 @@ public class CustomExceptionHandler
             problemDetails.Extensions.Add("ValidationErrors", validationException.Errors);
         }
 
-        await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken: cancellationToken);
+        CustomProblemDetails customProblemDetails = 
+            CustomProblemDetails.ToCustomProblemDetail(problemDetails);
+
+        await context.Response.WriteAsJsonAsync(
+            customProblemDetails, 
+            cancellationToken: cancellationToken);
+
         return true;
     }
 }

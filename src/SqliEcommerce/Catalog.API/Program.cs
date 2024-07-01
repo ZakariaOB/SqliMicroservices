@@ -27,6 +27,7 @@ builder.Services.AddCarter();
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+
 builder.Services.AddMarten(options =>
 {
     options.Connection(builder.Configuration.GetConnectionString("MartenDatabase")!);
@@ -56,7 +57,7 @@ app.UseHealthChecks("/health",
         ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
     });
 
-
+app.UseExceptionHandler(options => { });
 app.UseRouting();
 app.UseEndpoints(endpoints =>
 {
