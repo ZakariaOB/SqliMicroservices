@@ -1,0 +1,138 @@
+_____________________________________
+Assignment
+
+Command Side: Uses Marten to store the write model in a document database.
+Query Side: Uses a relational database to store the read model.
+Synchronization: Event-driven synchronization between the write and read models using an event bus.
+This design leverages the strengths of CQRS by separating the command and query responsibilities, 
+allowing each side to use the most appropriate database technology.
+_____________________________________
+
+CREATE TABLE Products (
+    Id UNIQUEIDENTIFIER PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    Category NVARCHAR(255) NOT NULL,
+    Description NVARCHAR(MAX) NOT NULL,
+    ImageFile NVARCHAR(255) NOT NULL,
+    Price DECIMAL(18, 2) NOT NULL,
+    Attributes NVARCHAR(MAX) NULL
+);
+
+-----------------------------------------
+
+CREATE INDEX IDX_Products_Category ON Products (Category);
+
+
+-----------------------------------------
+public class ProductReadModel
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = default!;
+    public string Category { get; set; } = default!;
+    public string Description { get; set; } = default!;
+    public string ImageFile { get; set; } = default!;
+    public decimal Price { get; set; }
+    public string Attributes { get; set; } = default!;
+}
+
+public class ProductDbContext : DbContext
+{
+    public DbSet<ProductReadModel> Products { get; set; }
+
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ProductReadModel>()
+            .HasKey(p => p.Id);
+
+        modelBuilder.Entity<ProductReadModel>()
+            .HasIndex(p => p.Category);
+    }
+}
+
+_______________________________________________
+
+public class ProductCreatedEvent
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = default!;
+    public List<string> Category { get; set; } = new List<string>();
+    public string Description { get; set; } = default!;
+    public string ImageFile { get; set; } = default!;
+    public decimal Price { get; set; }
+    public Dictionary<string, object>? Attributes { get; set; }
+
+    public ProductCreatedEvent(Product product)
+    {
+        Id = product.Id;
+        Name = product.Name;
+        Category = product.Category;
+        Description = product.Description;
+        ImageFile = product.ImageFile;
+        Price = product.Price;
+        Attributes = product.Attributes;
+    }
+}
+_______________________________________________
+public class ProductCreatedEventConsumer : IConsumer<ProductCreatedEvent>
+{
+    private readonly ProductDbContext _dbContext;
+
+    public ProductCreatedEventConsumer(ProductDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task Consume(ConsumeContext<ProductCreatedEvent> context)
+    {
+        var productEvent = context.Message;
+
+        var productReadModel = new ProductReadModel
+        {
+            Id = productEvent.Id,
+            Name = productEvent.Name,
+            Category = string.Join(",", productEvent.Category),
+            Description = productEvent.Description,
+            ImageFile = productEvent.ImageFile,
+            Price = productEvent.Price,
+            Attributes = JsonConvert.SerializeObject(productEvent.Attributes)
+        };
+
+        _dbContext.Products.Add(productReadModel);
+        await _dbContext.SaveChangesAsync();
+    }
+}
+-----------------------------------------------------------
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMarten(options =>
+    {
+        options.Connection("your_connection_string");
+        options.Schema.For<Product>();
+    });
+
+    services.AddDbContext<ProductDbContext>(options =>
+        options.UseSqlServer("your_connection_string"));
+
+    services.AddMassTransit(x =>
+    {
+        x.AddConsumer<ProductCreatedEventConsumer>();
+        
+        x.UsingRabbitMq((context, cfg) =>
+        {
+            cfg.Host("rabbitmq://localhost");
+            
+            cfg.ReceiveEndpoint("product-events", e =>
+            {
+                e.ConfigureConsumer<ProductCreatedEventConsumer>(context);
+            });
+        });
+    });
+
+    services.AddMassTransitHostedService();
+
+    services.AddMediatR(typeof(CreateProductCommandHandler).Assembly);
+}
+---------------------------------------------------------------
+
