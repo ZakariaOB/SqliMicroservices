@@ -8,6 +8,9 @@ using Discount.Grpc;
 using HealthChecks.UI.Client;
 using Marten;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Basket.API.Data.Repository;
+using Basket.API.Options;
+using System.Runtime.Caching;
 
 var builder = WebApplication.CreateBuilder(args);
 var assembly = typeof(Program).Assembly;
@@ -50,6 +53,11 @@ builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(
     return handler;
 });
 
+builder.Services.AddSingleton<ObjectCache>(MemoryCache.Default);
+
+var cachingSettings = new CachingSettings();
+builder.Configuration.GetSection(nameof(CachingSettings)).Bind(cachingSettings);
+
 /*
 builder.Services.AddScoped<IBasketRepository>(provider =>
 {
@@ -58,8 +66,26 @@ builder.Services.AddScoped<IBasketRepository>(provider =>
 });*/
 
 /* This is similar to the lines above*/
-builder.Services.Decorate<IBasketRepository, CachedBasketRepository>();
-// builder.Services.Decorate<IBasketRepository, TestCachedRepository>();
+//builder.Services.Decorate<IBasketRepository, CachedBasketRepository>();
+/*builder.Services.Decorate<IBasketRepository, TestCachedRepository>();*/
+
+
+// Decorate the repository based on the caching strategy
+switch (cachingSettings.Strategy)
+{
+    case CachingStrategy.Redis:
+        builder.Services.Decorate<IBasketRepository, CachedBasketRepository>();
+        break;
+    case CachingStrategy.InMemory:
+        builder.Services.Decorate<IBasketRepository, InMemoryCachedRepository>();
+        break;
+    case CachingStrategy.Test:
+        builder.Services.Decorate<IBasketRepository, TestCachedRepository>();
+        break;
+    default:
+        throw new Exception($"Unsupported caching strategy: {cachingSettings.Strategy}");
+}
+
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
