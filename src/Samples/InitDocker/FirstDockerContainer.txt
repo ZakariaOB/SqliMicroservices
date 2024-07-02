@@ -1,0 +1,43 @@
+docker run -d --name my-mysql -e MYSQL_ROOT_PASSWORD=mysql123! -p 3306:3306 mysql
+------------------------------------------------------
+
+This command runs a MySQL database server in a Docker container. Let's break it down:
+
+docker run: This is the command to create and start a new Docker container.
+-d: This flag runs the container in detached mode, meaning it runs in the background.
+--name my-mysql: This assigns the name "my-mysql" to the container, making it easier to reference later.
+-e MYSQL_ROOT_PASSWORD=mysql123!: This sets an environment variable inside the container. Here, it's setting the root password for MySQL to "mysql123!".
+-p 3306:3306: This maps port 3306 on the host machine to port 3306 in the container. MySQL typically uses port 3306, so this allows you to connect to the MySQL server from your host machine.
+mysql: This is the name of the Docker image to use, in this case the official MySQL image.
+
+After running this command:
+
+A new MySQL server will be running in a Docker container
+It will be accessible on your host machine at localhost:3306
+The root password will be set to "mysql123!"
+The container will be named "my-mysql"
+
+You can then connect to this MySQL server using any MySQL client, 
+using localhost as the host and 3306 as the port.
+Remember to change the root password to something secure 
+if you're using this in a production environment.
+-------------------------------------------------------
+
+docker exec -it my-mysql mysql -uroot -p
+
+CREATE DATABASE dbmysql; (; is necessary)
+
+use dbmysql;
+
+CREATE TABLE Products
+(
+     ProductID int,
+     ProductName varchar(1000),
+     Quantity int
+);
+
+INSERT INTO Products(ProductID,ProductName,Quantity) VALUES (1,'Mobile',100);
+INSERT INTO Products(ProductID,ProductName,Quantity) VALUES (2,'VL',200);
+INSERT INTO Products(ProductID,ProductName,Quantity) VALUES (3,'Tabs',300);
+
+select * from Products;
