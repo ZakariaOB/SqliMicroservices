@@ -11,6 +11,9 @@ service DiscountProtoService {
 	rpc CreateDiscount (CreateDiscountRequest) returns (CouponModel);
 	rpc UpdateDiscount (UpdateDiscountRequest) returns (CouponModel);
 	rpc DeleteDiscount (DeleteDiscountRequest) returns (DeleteDiscountResponse);
+
+	// New method to get multiple discounts
+    rpc GetMultipleDiscounts (GetMultipleDiscountsRequest) returns (GetMultipleDiscountsResponse);
 }
 
 message GetDiscountRequest {
@@ -38,4 +41,13 @@ message DeleteDiscountRequest {
 
 message DeleteDiscountResponse {
 	bool success = 1;
+}
+
+// New messages for the new method
+message GetMultipleDiscountsRequest {
+    repeated string productNames = 1;
+}
+
+message GetMultipleDiscountsResponse {
+    repeated CouponModel coupons = 1;
 }

@@ -80,4 +80,24 @@ public class DiscountService
 
         return new DeleteDiscountResponse { Success = true };
     }
+
+    public override async Task<GetMultipleDiscountsResponse> GetMultipleDiscounts(
+        GetMultipleDiscountsRequest request, 
+        ServerCallContext context)
+    {
+        List<Coupon> coupons = await dbContext.Coupons
+            .Where(x => request.ProductNames.Contains(x.ProductName))
+            .ToListAsync();
+
+        var response = new GetMultipleDiscountsResponse();
+        response.Coupons.AddRange(coupons.Select(c => new CouponModel
+        {
+            Id = c.Id,
+            ProductName = c.ProductName,
+            Description = c.Description,
+            Amount = c.Amount
+        }));
+
+        return response;
+    }
 }
