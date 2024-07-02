@@ -1,4 +1,6 @@
 docker run -d --name my-mysql -e MYSQL_ROOT_PASSWORD=mysql123! -p 3306:3306 mysql
+
+// docker run -d --name sqli-mc-mysql -e MYSQL_ROOT_PASSWORD=mysql123! -p 3306:3306 mysql
 ------------------------------------------------------
 
 This command runs a MySQL database server in a Docker container. Let's break it down:

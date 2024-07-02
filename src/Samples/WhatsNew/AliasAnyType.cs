@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Samples.WhatsNew
+﻿namespace Samples.WhatsNew
 {
-    // Alias declarations
-    using Point = (int X, int Y);
-    using StringList = List<string>;
-    using NumberDictionary = Dictionary<string, int>;
     using ComplexType = Dictionary<string, List<(int, string)>>;
+    using NumberDictionary = Dictionary<string, int>;
+    // Alias declarations
+    using PointHere = (int X, int Y);
+    using StringList = List<string>;
 
     public class AliasAnyType
     {
         // Using alias for a tuple
-        public Point CreatePoint(int x, int y) => (x, y);
+        public PointHere CreatePoint(int x, int y) => (x, y);
 
         // Using alias for a generic type
         public StringList GetNames() => ["Alice", "Bob", "Charlie"];
@@ -37,7 +31,7 @@ namespace Samples.WhatsNew
 
         // Method using multiple aliases
         public void ProcessData(
-            Point location, 
+            PointHere location, 
             StringList names, 
             NumberDictionary ages)
         {
