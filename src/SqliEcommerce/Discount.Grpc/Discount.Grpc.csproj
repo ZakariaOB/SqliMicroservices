@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Protobuf Include="Protos\discount.proto" GrpcServices="Server" />
+	  <Protobuf Include="Protos\hello.proto" GrpcServices="Server" />
   </ItemGroup>
 
 </Project>
