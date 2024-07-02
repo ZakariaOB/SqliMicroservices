@@ -34,15 +34,31 @@ public class StoreBasketCommandHandler
     private async Task DeductDiscount(ShoppingCart cart, CancellationToken cancellationToken)
     {
         // Communicate with Discount.Grpc and calculate lastest prices of products into sc
-        foreach (var item in cart.Items)
+        IEnumerable<string> productNames = cart.Items.Select(item => item.ProductName);
+
+        // Create the request object
+        var request = new GetMultipleDiscountsRequest
         {
-            var coupon = await discountClient.GetDiscountAsync(new GetDiscountRequest 
-            { 
-                ProductName = item.ProductName 
-            }, 
+            ProductNames = { productNames }
+        };
+
+        // Call the async method
+        GetMultipleDiscountsResponse response = await discountClient.GetMultipleDiscountsAsync(
+            request, 
             cancellationToken: cancellationToken);
 
-            item.Price -= coupon.Amount;
+        if (response == null || response.Coupons == null || response.Coupons.Count == 0)
+        {
+            return; // Or return an appropriate value if this is inside a method
+        }
+
+        foreach (var coupon in response.Coupons)
+        {
+            var item = cart.Items.FirstOrDefault(i => i.ProductName == coupon.ProductName);
+            if (item != null)
+            {
+                item.Price -= coupon.Amount;
+            }
         }
     }
 }
