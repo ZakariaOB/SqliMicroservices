@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <Folder Include="InitDocker\" />
+    <Folder Include="Tasks\" />
   </ItemGroup>
 
 </Project>
