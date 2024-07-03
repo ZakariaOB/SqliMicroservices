@@ -15,15 +15,7 @@ public class CreateOrderHandler(IApplicationDbContext dbContext)
         Order order = CreateNewOrder(command.Order);
 
         dbContext.Orders.Add(order);
-
-        try
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.ToString());
-        }
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return new CreateOrderResult(order.Id.Value);
     }
