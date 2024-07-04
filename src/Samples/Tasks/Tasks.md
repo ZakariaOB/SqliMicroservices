@@ -5,7 +5,7 @@
     - ../products/categories"
  - Add attributes property to product table => **Attributes = new Dictionary<string, object>**
 
- - Separate read on write database => Steps descriptions
+ - Mimoun: Separate read and write database => Steps descriptions
  - Validations
     - Add some custom validations: 
        - Should Have Description If Price IsGreater Than100
