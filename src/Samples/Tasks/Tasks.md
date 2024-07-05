@@ -16,6 +16,7 @@
 **Basket**
  - TODO Justify the choice of the decorator pattern over inheritance 
  - Add decorator strategy : InMemory, Redis or Test
+ - Siham : Add more cases to showcase some addtional functionnalities at Basket service
 
 **Discount**
  - Resolve the N + 1 problem in Discount and Basket  
