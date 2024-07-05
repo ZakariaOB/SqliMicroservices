@@ -19,7 +19,10 @@
  - Siham : Add more cases to showcase some addtional functionnalities at Basket service
 
 **Discount**
- - Resolve the N + 1 problem in Discount and Basket  
+ - Resolve the N + 1 problem in Discount and Basket 
+ - Create a discount table in Basket API 
+ - Try to refresh this table usng async communication from Basket service 
+   using rabbitMQ .
 
 **Ordering**
  - Using repositories inside the ordering module .
