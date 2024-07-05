@@ -1,13 +1,17 @@
-﻿using Discount.Grpc.Data;
+﻿using Common.Messaging.Events;
+using Discount.Grpc.Data;
 using Discount.Grpc.Models;
 using Grpc.Core;
 using Mapster;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace Discount.Grpc.Services;
 
 public class DiscountService
-    (DiscountContext dbContext, ILogger<DiscountService> logger)
+    (DiscountContext dbContext, ILogger<DiscountService> logger, 
+    IPublishEndpoint publishEndpoint)
     : DiscountProtoService.DiscountProtoServiceBase
 {    
     public override async Task<CouponModel> GetDiscount(GetDiscountRequest request, ServerCallContext context)
@@ -25,11 +29,18 @@ public class DiscountService
         return couponModel;
     }
 
-    public override async Task<CouponModel> CreateDiscount(CreateDiscountRequest request, ServerCallContext context)
+    public override async Task<CouponModel> CreateDiscount(
+        CreateDiscountRequest request, 
+        ServerCallContext context)
     {
         var coupon = request.Coupon.Adapt<Coupon>();
         if (coupon is null)
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request object."));
+
+        await publishEndpoint.Publish(new DiscountUpdatedEvent 
+        { 
+            Amount = coupon.Amount 
+        });
 
         dbContext.Coupons.Add(coupon);
         await dbContext.SaveChangesAsync();

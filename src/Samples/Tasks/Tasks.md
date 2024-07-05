@@ -21,7 +21,7 @@
 **Discount**
  - Resolve the N + 1 problem in Discount and Basket 
  - Create a discount table in Basket API 
- - Try to refresh this table usng async communication from Basket service 
+ - Try to refresh this table using async communication from Basket service 
    using rabbitMQ .
 
 **Ordering**
