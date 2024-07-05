@@ -14,6 +14,7 @@
 
 
 **Basket**
+ - TODO Justify the choice of the decorator pattern over inheritance 
  - Add decorator strategy : InMemory, Redis or Test
 
 **Discount**
